@@ -1,0 +1,5 @@
+toc:
+  - group: Custom Guides
+    items:
+      - page: Authentication
+        file: guide1.md

@@ -1,0 +1,600 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "WaveSuite Common Platform Audit Logging Service API",
+        "description": "API definition for WaveSuite Common Platform Audit Logging Service",
+        "version": "22.08.0"
+    },
+    "tags": [
+        {
+            "name": "AuditLogs",
+            "description": "The Audit Logging API"
+        }
+    ],
+    "paths": {
+        "/audit-logs": {
+            "get": {
+                "tags": [
+                    "AuditLogs"
+                ],
+                "description": "Retrieve audit logs for the current user.",
+                "operationId": "getAuditLogs",
+                "parameters": [
+                    {
+                        "name": "orderBy",
+                        "in": "query",
+                        "description": "Sort order based on property name and direction. Multiple orderBy parameters are supported. Format is 'propertyName:direction', where direction can be either ASC for ascending or DESC for descending.\n\n*Example:  eventDate:DESC&orderBy=eventType:ASC*",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "pageNumber",
+                        "in": "query",
+                        "description": "The number of the page to retrieve (numbering starts at 0).\n\n*Example:  5*",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "The number of records to retrieve per page (default is 30).\n\n*Example:  10*",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "filterBy",
+                        "in": "query",
+                        "description": "The set of parameters used to filter elements into the result.\n\nThe value is query string styled, with one or more propertyName=filterInValue separated by an ampersand (&). \n\nFor the eventData parameter, key and value pair fields are supported with an eventData[key]=value format. For eventData fields with sub-keys, append each sub-key as eventData[key][sub-key1]...[sub-keyN]=value.\n\n*Example:  eventType=UserCreate&eventData[source]=Local*",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponseListPageAuditLog"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QueryParametersNotSupportedException"
+                                },
+                                "example": {
+                                    "timestamp": "2022-08-03T20:57:07.998+00:00",
+                                    "errorMessage": "The parameters that are not supported for audit logs filtering: [invalidParamName]. The list of supported parameters are as follows: ",
+                                    "allowableParameters": [
+                                        "clientIpAddress",
+                                        "eventData",
+                                        "tenantName",
+                                        "auditLogId",
+                                        "eventStatus",
+                                        "affectedTenant",
+                                        "eventEndTime",
+                                        "tenantId",
+                                        "eventName",
+                                        "eventStartTime",
+                                        "eventType",
+                                        "userName"
+                                    ],
+                                    "path": "/wavesuite/cp/audit-logging/api/v1/audit-logs"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ForbiddenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not Authorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "QueryParametersNotSupportedException": {
+                "type": "object",
+                "properties": {
+                    "cause": {
+                        "type": "object",
+                        "properties": {
+                            "stackTrace": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "classLoaderName": {
+                                            "type": "string"
+                                        },
+                                        "moduleName": {
+                                            "type": "string"
+                                        },
+                                        "moduleVersion": {
+                                            "type": "string"
+                                        },
+                                        "methodName": {
+                                            "type": "string"
+                                        },
+                                        "fileName": {
+                                            "type": "string"
+                                        },
+                                        "lineNumber": {
+                                            "type": "integer",
+                                            "format": "int32"
+                                        },
+                                        "className": {
+                                            "type": "string"
+                                        },
+                                        "nativeMethod": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string"
+                            },
+                            "suppressed": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "stackTrace": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "classLoaderName": {
+                                                        "type": "string"
+                                                    },
+                                                    "moduleName": {
+                                                        "type": "string"
+                                                    },
+                                                    "moduleVersion": {
+                                                        "type": "string"
+                                                    },
+                                                    "methodName": {
+                                                        "type": "string"
+                                                    },
+                                                    "fileName": {
+                                                        "type": "string"
+                                                    },
+                                                    "lineNumber": {
+                                                        "type": "integer",
+                                                        "format": "int32"
+                                                    },
+                                                    "className": {
+                                                        "type": "string"
+                                                    },
+                                                    "nativeMethod": {
+                                                        "type": "boolean"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "localizedMessage": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "localizedMessage": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "stackTrace": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "classLoaderName": {
+                                    "type": "string"
+                                },
+                                "moduleName": {
+                                    "type": "string"
+                                },
+                                "moduleVersion": {
+                                    "type": "string"
+                                },
+                                "methodName": {
+                                    "type": "string"
+                                },
+                                "fileName": {
+                                    "type": "string"
+                                },
+                                "lineNumber": {
+                                    "type": "integer",
+                                    "format": "int32"
+                                },
+                                "className": {
+                                    "type": "string"
+                                },
+                                "nativeMethod": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "requestPath": {
+                        "type": "string"
+                    },
+                    "invalidParams": {
+                        "uniqueItems": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "validParams": {
+                        "uniqueItems": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "suppressed": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "stackTrace": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "classLoaderName": {
+                                                "type": "string"
+                                            },
+                                            "moduleName": {
+                                                "type": "string"
+                                            },
+                                            "moduleVersion": {
+                                                "type": "string"
+                                            },
+                                            "methodName": {
+                                                "type": "string"
+                                            },
+                                            "fileName": {
+                                                "type": "string"
+                                            },
+                                            "lineNumber": {
+                                                "type": "integer",
+                                                "format": "int32"
+                                            },
+                                            "className": {
+                                                "type": "string"
+                                            },
+                                            "nativeMethod": {
+                                                "type": "boolean"
+                                            }
+                                        }
+                                    }
+                                },
+                                "message": {
+                                    "type": "string"
+                                },
+                                "localizedMessage": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "localizedMessage": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ForbiddenResponse": {
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "type": "string",
+                        "description": "Timestamp indicating the date on which the error occurred",
+                        "format": "date-time"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "description": "The HTTP status code",
+                        "format": "int32",
+                        "example": 403
+                    },
+                    "error": {
+                        "type": "string",
+                        "description": "The HTTP reason phrase",
+                        "example": "Forbidden"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "The API endpoint path",
+                        "example": "/wavesuite/cp/audit-logging/api/v1/audit-logs"
+                    }
+                }
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object"
+                    },
+                    "httpError": {
+                        "$ref": "#/components/schemas/HTTPError"
+                    }
+                }
+            },
+            "HTTPError": {
+                "type": "object",
+                "properties": {
+                    "errorType": {
+                        "type": "string",
+                        "description": "The type of the error",
+                        "example": "UNAUTHORIZED",
+                        "enum": [
+                            "ALREADY_EXISTS",
+                            "BAD_REQUEST",
+                            "DB_CONNECTIVITY",
+                            "FORBIDDEN",
+                            "ILLEGAL_STATE",
+                            "IN_PROGRESS",
+                            "IN_USE",
+                            "INTERNAL_SERVER_ERROR",
+                            "MISSING",
+                            "NOT_FOUND",
+                            "NOT_SUPPORTED",
+                            "PRECONDITION_FAILURE",
+                            "SERVICE_UNAVAILABLE",
+                            "UNAUTHORIZED",
+                            "UNKNOWN",
+                            "WARNING"
+                        ]
+                    },
+                    "errorMessage": {
+                        "type": "string",
+                        "description": "The error message",
+                        "example": "Not authorized to perform this operation"
+                    }
+                }
+            },
+            "AuditLog": {
+                "type": "object",
+                "properties": {
+                    "auditLogId": {
+                        "type": "string",
+                        "description": "The id of the audit log event",
+                        "example": "ded38a31-1baa-4a93-a4d8-3601feb2f9b2"
+                    },
+                    "eventName": {
+                        "type": "string",
+                        "description": "The name of the audit log event",
+                        "example": "User Login"
+                    },
+                    "eventType": {
+                        "type": "string",
+                        "description": "The type of the audit log event",
+                        "example": "UserLogin"
+                    },
+                    "eventDate": {
+                        "type": "string",
+                        "description": "The date on which the audit log event occurred",
+                        "format": "date-time"
+                    },
+                    "eventStatus": {
+                        "type": "string",
+                        "description": "The status of the audit log event",
+                        "example": "SUCCESS",
+                        "enum": [
+                            "success",
+                            "failed",
+                            "warning",
+                            "unknown"
+                        ]
+                    },
+                    "eventData": {
+                        "type": "string",
+                        "description": "The details of the audit log event",
+                        "example": "{\"Username\":\"admin\"}"
+                    },
+                    "userName": {
+                        "type": "string",
+                        "description": "The name of the user that triggered the audit event",
+                        "example": "admin"
+                    },
+                    "tenantId": {
+                        "type": "string",
+                        "description": "The id of the tenant/realm",
+                        "example": "wavesuite"
+                    },
+                    "tenantLabel": {
+                        "type": "string",
+                        "description": "The name of the tenant/realm",
+                        "example": "WaveSuite"
+                    },
+                    "clientIpAddress": {
+                        "type": "string",
+                        "description": "The IP address of the client",
+                        "example": "123.456.78.9"
+                    },
+                    "affectedTenants": {
+                        "type": "array",
+                        "description": "The list of associated affected tenants/realms",
+                        "example": [],
+                        "items": {
+                            "$ref": "#/components/schemas/TenantInfo"
+                        }
+                    }
+                },
+                "description": "Audit Log"
+            },
+            "BaseResponseListPageAuditLog": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PageAuditLog"
+                        }
+                    },
+                    "httpError": {
+                        "$ref": "#/components/schemas/HTTPError"
+                    }
+                }
+            },
+            "PageAuditLog": {
+                "type": "object",
+                "properties": {
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "pageable": {
+                        "$ref": "#/components/schemas/PageableObject"
+                    },
+                    "first": {
+                        "type": "boolean"
+                    },
+                    "last": {
+                        "type": "boolean"
+                    },
+                    "numberOfElements": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "sort": {
+                        "$ref": "#/components/schemas/Sort"
+                    },
+                    "number": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "size": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "content": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AuditLog"
+                        }
+                    },
+                    "empty": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "PageableObject": {
+                "type": "object",
+                "properties": {
+                    "pageNumber": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "pageSize": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "paged": {
+                        "type": "boolean"
+                    },
+                    "unpaged": {
+                        "type": "boolean"
+                    },
+                    "sort": {
+                        "$ref": "#/components/schemas/Sort"
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            },
+            "Sort": {
+                "type": "object",
+                "properties": {
+                    "sorted": {
+                        "type": "boolean"
+                    },
+                    "unsorted": {
+                        "type": "boolean"
+                    },
+                    "empty": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "TenantInfo": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "tenantId": {
+                        "type": "string"
+                    },
+                    "tenantLabel": {
+                        "type": "string"
+                    }
+                },
+                "description": "The list of associated affected tenants/realms",
+                "example": []
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}
